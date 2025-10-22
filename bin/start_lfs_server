@@ -1,0 +1,77 @@
+#!/bin/bash
+# Start lfs-test-server with admin interface enabled
+
+export LFS_CONTENTPATH=/opt/lfs-test-server
+export LFS_ADMINUSER=admin
+export LFS_ADMINPASS=admin123
+
+unset RUNNING_FROM_CRON
+if [ -n "$CRON" ] || [ "$(ps -p $PPID -o comm=)" = "cron" ]; then
+  export RUNNING_FROM_CRON=true
+fi
+
+# Wait for network connectivity in case the machine is starting up
+until ping -c 1 8.8.8.8 >/dev/null 2>&1; do
+  sleep 1
+done
+
+# Install lfs-test-server if not found
+if ! command -v lfs-test-server >/dev/null 2>&1; then
+  if ! go install github.com/git-lfs/lfs-test-server@latest; then
+    echo "$(date): Error: Failed to install lfs-test-server" >&2
+    exit 4
+  fi
+fi
+
+export LFS_REPO=/opt/lfs-test-server
+export LFS_PORT=8080
+export SERVER=$(uname -n)
+export LOG_FILE="$LFS_REPO/lfs-server.log"
+
+# Validate LFS_REPO
+if [ ! -e "$LFS_REPO" ]; then
+  echo "$(date): Error: $LFS_REPO does not exist" >&2
+  exit 2
+fi
+if [ ! -d "$LFS_REPO" ]; then
+  echo "$(date): Error: $LFS_REPO is not a directory" >&2
+  exit 3
+fi
+
+cd "$LFS_REPO" || {
+  echo "$(date): Error: Failed to change to $LFS_REPO" >&2
+  exit 1
+}
+
+# Kill existing instance (restrict to current user)
+pkill -u "$(whoami)" lfs-test-server 2>/dev/null
+
+rm "$LOG_FILE" # Not everyone might want this
+
+if [ "$RUNNING_FROM_CRON" ]; then
+  {
+    echo "$(date): LFS Test Server started on $SERVER:$LFS_PORT"
+    echo "$(date): Admin interface: http://$SERVER:$LFS_PORT/mgmt"
+  } >> "$LOG_FILE"
+else
+  echo "LFS Test Server started on $SERVER:$LFS_PORT"
+  echo "Admin interface: http://$SERVER:$LFS_PORT/mgmt"
+fi
+
+# Start server in background with verbose logging
+nohup ~/go/bin/lfs-test-server -verbose -addr :$LFS_PORT &>> "$LOG_FILE" &
+
+# Wait briefly to ensure the server starts
+sleep 2
+
+# Verify the server is running
+if ! pgrep -u "$(whoami)" lfs-test-server >/dev/null; then
+  echo "$(date): Error: lfs-test-server failed to start, check $SERVER:$LOG_FILE" >&2
+  [ "$RUNNING_FROM_CRON" ] && echo "$(date): Error: lfs-test-server failed to start" >> "$LOG_FILE"
+  exit 5
+fi
+
+if [ ! "$RUNNING_FROM_CRON" ]; then
+  echo "Tailing $SERVER:$LOG_FILE..."
+  tail -f "$LOG_FILE"
+fi
