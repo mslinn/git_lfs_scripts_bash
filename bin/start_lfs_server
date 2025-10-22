@@ -24,7 +24,7 @@ if ! command -v lfs-test-server >/dev/null 2>&1; then
 fi
 
 export LFS_REPO=/opt/lfs-test-server
-export LFS_PORT=8080
+export LFS_PORT=8079
 export SERVER=$(uname -n)
 export LOG_FILE="$LFS_REPO/lfs-server.log"
 
