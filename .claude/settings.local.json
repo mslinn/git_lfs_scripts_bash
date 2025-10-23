@@ -35,7 +35,13 @@
       "Bash(make install:*)",
       "Bash(git lfs-track:*)",
       "Bash(make test:*)",
-      "Bash(goreleaser:*)"
+      "Bash(goreleaser:*)",
+      "WebSearch",
+      "WebFetch(domain:pypi.org)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:giftless.datopian.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []
