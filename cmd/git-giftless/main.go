@@ -149,8 +149,8 @@ func checkPrerequisites() {
 
 	// Check giftless direct dependencies
 	deps := []struct {
-		module  string
-		package string
+		module string
+		pkg    string
 	}{
 		{"azure.storage.blob", "azure-storage-blob"},
 		{"boto3", "boto3"},
@@ -173,7 +173,7 @@ func checkPrerequisites() {
 
 	for _, dep := range deps {
 		if err := checkCommand("python3", "-c", "import "+dep.module); err != nil {
-			missing = append(missing, dep.package+" (install with: pip install "+dep.package+")")
+			missing = append(missing, dep.pkg+" (install with: pip install "+dep.pkg+")")
 		}
 	}
 
