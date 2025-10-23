@@ -217,7 +217,7 @@ changelog:
 release:
   github:
     owner: mslinn
-    name: "{{ .ProjectName }}"
+    name: git_lfs_scripts_go
   draft: false
   prerelease: auto
   mode: replace
