@@ -119,9 +119,11 @@ func printHelp() {
 
 		REQUIREMENTS:
 		  - Python 3 (python3 command must be available)
-		  - flask Python package (pip install flask)
-		  - flask-marshmallow Python package (pip install flask-marshmallow)
-		  - figcan Python package (pip install figcan)
+		  - Giftless direct dependencies:
+		    azure-storage-blob, boto3, cachetools, cryptography, figcan,
+		    flask, flask-classful, flask-marshmallow, google-cloud-storage,
+		    importlib-metadata, pyjwt, python-dateutil, python-dotenv,
+		    pyyaml, typing-extensions, webargs, werkzeug
 		  - giftless Python package (pip install giftless)
 		  - uwsgi Python package (pip install uwsgi)
 
@@ -145,19 +147,34 @@ func checkPrerequisites() {
 		missing = append(missing, "Python 3 (install from: https://www.python.org/)")
 	}
 
-	// Check Flask
-	if err := checkCommand("python3", "-c", "import flask"); err != nil {
-		missing = append(missing, "flask (install with: pip install flask)")
+	// Check giftless direct dependencies
+	deps := []struct {
+		module  string
+		package string
+	}{
+		{"azure.storage.blob", "azure-storage-blob"},
+		{"boto3", "boto3"},
+		{"cachetools", "cachetools"},
+		{"cryptography", "cryptography"},
+		{"figcan", "figcan"},
+		{"flask", "flask"},
+		{"flask_classful", "flask-classful"},
+		{"flask_marshmallow", "flask-marshmallow"},
+		{"google.cloud.storage", "google-cloud-storage"},
+		{"importlib_metadata", "importlib-metadata"},
+		{"jwt", "pyjwt"},
+		{"dateutil", "python-dateutil"},
+		{"dotenv", "python-dotenv"},
+		{"yaml", "pyyaml"},
+		{"typing_extensions", "typing-extensions"},
+		{"webargs", "webargs"},
+		{"werkzeug", "werkzeug"},
 	}
 
-	// Check flask_marshmallow
-	if err := checkCommand("python3", "-c", "import flask_marshmallow"); err != nil {
-		missing = append(missing, "flask-marshmallow (install with: pip install flask-marshmallow)")
-	}
-
-	// Check figcan
-	if err := checkCommand("python3", "-c", "import figcan"); err != nil {
-		missing = append(missing, "figcan (install with: pip install figcan)")
+	for _, dep := range deps {
+		if err := checkCommand("python3", "-c", "import "+dep.module); err != nil {
+			missing = append(missing, dep.package+" (install with: pip install "+dep.package+")")
+		}
 	}
 
 	// Check giftless
