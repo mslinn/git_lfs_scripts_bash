@@ -82,12 +82,29 @@ git lfs-track -ce mp3
 # Dry run to see what would be tracked
 git lfs-track -dce mp3 mp4
 
+# Flags can be combined or separate
+git lfs-track -d -c -e mp3    # Same as -dce
+
+# Long flag names are also supported
+git lfs-track --dryrun --bothcases --everywhere mp3
+
 # List all files not tracked by LFS
 git nonlfs
 
 # Unmigrate files from LFS back to Git
 git unmigrate -ce mp3
 ```
+
+#### Common Flags
+
+Commands that support pattern permutation (`git-ls-files`, `git-lfs-files`, `git-lfs-track`, `git-lfs-untrack`) support:
+
+* `-c`, `--bothcases` - Expand pattern to upper and lower case (useful for media files)
+* `-d`, `--dryrun` - Show what would be done without executing
+* `-e`, `--everywhere` - Apply pattern recursively in all directories
+* `-h`, `--help` - Show help message
+
+Flags can be combined (e.g., `-dce`) or used separately (e.g., `-d -c -e`).
 
 ### Server and Repository Commands
 
@@ -107,7 +124,15 @@ git delete-github-repo my-test-repo
 To use the LFS trace adapter, configure it in your Git LFS config:
 
 ```shell
-git config lfs.customtransfer.trace.path git-lfs-trace
+git config lfs.customtransfer.trace.path `which git-lfs-trace`
+```
+
+The above adds something similar to the following to the current Git repository configuration
+(`.git/config`)
+
+```text
+[lfs "customtransfer.trace"]
+  path = /home/mslinn/go/bin/git-lfs-trace
 ```
 
 
@@ -124,7 +149,7 @@ make tidy           # Tidy go.mod
 
 ### Project Structure
 
-```
+```text
 .
 ├── cmd/                    # Command implementations
 │   ├── git-ls-files/
@@ -144,14 +169,3 @@ make tidy           # Tidy go.mod
 ├── Makefile               # Build automation
 └── README.md              # This file
 ```
-
-
-## Migration from Bash Scripts
-
-This project was converted from bash scripts to Go for better:
-* Cross-platform compatibility
-* Error handling
-* Maintainability
-* Type safety
-
-The original bash scripts are preserved in the `bin/` directory for reference.

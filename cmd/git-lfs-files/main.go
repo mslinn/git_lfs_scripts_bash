@@ -1,22 +1,22 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
 	"github.com/mslinn/git_lfs_scripts/internal/lfsfiles"
+	"github.com/spf13/pflag"
 )
 
 func main() {
 	var opts lfsfiles.Options
 	var showHelp bool
 
-	flag.BoolVar(&opts.BothCases, "c", false, "Expand pattern to upper and lower case")
-	flag.BoolVar(&opts.DryRun, "d", false, "Dry run")
-	flag.BoolVar(&opts.Everywhere, "e", false, "Apply pattern everywhere")
-	flag.BoolVar(&showHelp, "h", false, "Show help")
-	flag.Parse()
+	pflag.BoolVarP(&opts.BothCases, "bothcases", "c", false, "Expand pattern to upper and lower case")
+	pflag.BoolVarP(&opts.DryRun, "dryrun", "d", false, "Dry run")
+	pflag.BoolVarP(&opts.Everywhere, "everywhere", "e", false, "Apply pattern everywhere")
+	pflag.BoolVarP(&showHelp, "help", "h", false, "Show help")
+	pflag.Parse()
 
 	if showHelp {
 		lfsfiles.PrintHelp(lfsfiles.LfsLsFiles)
@@ -24,7 +24,7 @@ func main() {
 	}
 
 	opts.Command = lfsfiles.GetCommandString(lfsfiles.LfsLsFiles)
-	patterns := flag.Args()
+	patterns := pflag.Args()
 
 	if err := lfsfiles.Execute(patterns, opts); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
