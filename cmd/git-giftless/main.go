@@ -119,6 +119,8 @@ func printHelp() {
 
 		REQUIREMENTS:
 		  - Python 3 (python3 command must be available)
+		  - flask Python package (pip install flask)
+		  - flask-marshmallow Python package (pip install flask-marshmallow)
 		  - giftless Python package (pip install giftless)
 		  - uwsgi Python package (pip install uwsgi)
 
@@ -140,6 +142,16 @@ func checkPrerequisites() {
 	// Check Python 3
 	if err := checkCommand("python3", "--version"); err != nil {
 		missing = append(missing, "Python 3 (install from: https://www.python.org/)")
+	}
+
+	// Check Flask
+	if err := checkCommand("python3", "-c", "import flask"); err != nil {
+		missing = append(missing, "flask (install with: pip install flask)")
+	}
+
+	// Check flask_marshmallow
+	if err := checkCommand("python3", "-c", "import flask_marshmallow"); err != nil {
+		missing = append(missing, "flask-marshmallow (install with: pip install flask-marshmallow)")
 	}
 
 	// Check giftless
