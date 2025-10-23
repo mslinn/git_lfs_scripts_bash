@@ -11,6 +11,7 @@
 
 # Go build artifacts
 build/
+dist/
 *.exe
 *.dll
 *.so
