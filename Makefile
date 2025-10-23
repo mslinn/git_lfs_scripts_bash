@@ -1,4 +1,4 @@
-.PHONY: all build install clean test help
+.PHONY: all build install clean test help build-release-tool
 
 # Go parameters
 GOCMD=go
@@ -80,6 +80,7 @@ clean:
 	@echo "Cleaning build artifacts..."
 	@$(GOCLEAN)
 	@rm -rf $(BUILD_DIR)
+	@rm -f release
 	@echo "Clean complete!"
 
 test:
@@ -107,3 +108,9 @@ build-darwin:
 
 build-windows:
 	@GOOS=windows GOARCH=amd64 $(MAKE) build
+
+build-release-tool: ## Build the release tool (developers only)
+	@echo "Building release tool (for developers)..."
+	$(GOBUILD) -o release ./cmd/release
+	@echo "Build complete: ./release"
+	@echo "Note: This is a development tool and is not installed with 'go install'"

@@ -1,0 +1,251 @@
+# GoReleaser configuration for git_lfs_scripts
+# See https://goreleaser.com for documentation
+
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+    - go test ./...
+
+builds:
+  - id: git-ls-files
+    main: ./cmd/git-ls-files
+    binary: git-ls-files
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/mslinn/git_lfs_scripts/internal/common.Version={{.Version}}
+
+  - id: git-lfs-files
+    main: ./cmd/git-lfs-files
+    binary: git-lfs-files
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/mslinn/git_lfs_scripts/internal/common.Version={{.Version}}
+
+  - id: git-lfs-track
+    main: ./cmd/git-lfs-track
+    binary: git-lfs-track
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/mslinn/git_lfs_scripts/internal/common.Version={{.Version}}
+
+  - id: git-lfs-untrack
+    main: ./cmd/git-lfs-untrack
+    binary: git-lfs-untrack
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/mslinn/git_lfs_scripts/internal/common.Version={{.Version}}
+
+  - id: git-lfs-trace
+    main: ./cmd/git-lfs-trace
+    binary: git-lfs-trace
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/mslinn/git_lfs_scripts/internal/common.Version={{.Version}}
+
+  - id: git-nonlfs
+    main: ./cmd/git-nonlfs
+    binary: git-nonlfs
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/mslinn/git_lfs_scripts/internal/common.Version={{.Version}}
+
+  - id: git-unmigrate
+    main: ./cmd/git-unmigrate
+    binary: git-unmigrate
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/mslinn/git_lfs_scripts/internal/common.Version={{.Version}}
+
+  - id: git-new-bare-repo
+    main: ./cmd/git-new-bare-repo
+    binary: git-new-bare-repo
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/mslinn/git_lfs_scripts/internal/common.Version={{.Version}}
+
+  - id: git-delete-github-repo
+    main: ./cmd/git-delete-github-repo
+    binary: git-delete-github-repo
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/mslinn/git_lfs_scripts/internal/common.Version={{.Version}}
+
+  - id: git-giftless
+    main: ./cmd/git-giftless
+    binary: git-giftless
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/mslinn/git_lfs_scripts/internal/common.Version={{.Version}}
+
+archives:
+  - id: git-lfs-scripts-archive
+    formats:
+      - tar.gz
+      - zip
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- .Os }}_
+      {{- .Arch }}
+    files:
+      - README.md
+      - LICENSE
+      - CHANGELOG.md
+
+checksum:
+  name_template: 'checksums.txt'
+  algorithm: sha256
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+      - Merge pull request
+      - Merge branch
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: 'Bug fixes'
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: 'Enhancements'
+      regexp: '^.*?(enhance|improvement)(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: Others
+      order: 999
+
+release:
+  github:
+    owner: mslinn
+    name: git_lfs_scripts_bash
+  draft: false
+  prerelease: auto
+  mode: replace
+  header: |
+    ## Release {{ .Tag }}
+
+    Git LFS Scripts - Go implementations of Git LFS helper commands.
+
+    Download the appropriate archive for your platform below and extract all binaries to your PATH.
+  footer: |
+    ## Installation
+
+    ### Quick Install
+    Download the archive for your platform, extract it, and add the binaries to your PATH:
+
+    ```bash
+    # Linux/macOS example
+    tar -xzf git_lfs_scripts_{{ .Version }}_linux_amd64.tar.gz
+    sudo mv git-* /usr/local/bin/
+    ```
+
+    ### Verify Installation
+    ```bash
+    git ls-files --help
+    git lfs-track --help
+    git nonlfs --help
+    ```
+
+    ---
+
+    **Full Changelog**: https://github.com/mslinn/git_lfs_scripts_bash/compare/{{ .PreviousTag }}...{{ .Tag }}
