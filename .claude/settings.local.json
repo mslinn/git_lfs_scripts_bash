@@ -28,7 +28,10 @@
       "Bash(./build/git-unmigrate:*)",
       "Bash(./build/git-new-bare-repo:*)",
       "Bash(./build/git-lfs-files:*)",
-      "Bash(./build/git-lfs-untrack:*)"
+      "Bash(./build/git-lfs-untrack:*)",
+      "Bash(grep:*)",
+      "Bash(git pull:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
