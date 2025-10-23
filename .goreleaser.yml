@@ -217,7 +217,7 @@ changelog:
 release:
   github:
     owner: mslinn
-    name: git_lfs_scripts_bash
+    name: "{{ .ProjectName }}"
   draft: false
   prerelease: auto
   mode: replace
@@ -235,7 +235,7 @@ release:
 
     ```bash
     # Linux/macOS example
-    tar -xzf git_lfs_scripts_{{ .Version }}_linux_amd64.tar.gz
+    tar -xzf {{ .ProjectName }}_{{ .Version }}_linux_amd64.tar.gz
     sudo mv git-* /usr/local/bin/
     ```
 
@@ -248,4 +248,4 @@ release:
 
     ---
 
-    **Full Changelog**: https://github.com/mslinn/git_lfs_scripts_bash/compare/{{ .PreviousTag }}...{{ .Tag }}
+    **Full Changelog**: https://github.com/mslinn/{{ .ProjectName }}/compare/{{ .PreviousTag }}...{{ .Tag }}
