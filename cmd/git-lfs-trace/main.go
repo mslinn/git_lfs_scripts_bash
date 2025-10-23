@@ -50,7 +50,7 @@ func printHelp() {
 
 		EXAMPLES:
 		  # Configure Git LFS to use this trace adapter
-		  git config lfs.customtransfer.trace.path git-lfs-trace
+		  git config lfs.customtransfer.trace.path $(which git-lfs-trace)
 		  git config lfs.standalonetransferagent trace
 
 		  # Push files and observe the LFS protocol
