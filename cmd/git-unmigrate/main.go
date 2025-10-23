@@ -171,9 +171,8 @@ func checkLFSInitialized() {
 	if os.IsNotExist(err) {
 		fmt.Fprintf(os.Stderr, "Error: Git LFS is not configured for this repository.\n")
 		fmt.Fprintf(os.Stderr, "No .gitattributes file found.\n")
-		fmt.Fprintf(os.Stderr, "\nTo set up Git LFS, run:\n")
-		fmt.Fprintf(os.Stderr, "  git lfs install\n")
-		fmt.Fprintf(os.Stderr, "  git lfs track \"*.extension\"\n")
+		fmt.Fprintf(os.Stderr, "\nLearn about Git LFS at:\n")
+		fmt.Fprintf(os.Stderr, "  https://www.mslinn.com/git/5100-git-lfs-overview.html\n")
 		os.Exit(1)
 	}
 	if err != nil {
@@ -195,8 +194,8 @@ func checkLFSInitialized() {
 	if !hasLFSPattern {
 		fmt.Fprintf(os.Stderr, "Error: Git LFS is not configured for this repository.\n")
 		fmt.Fprintf(os.Stderr, "No LFS tracked patterns found in .gitattributes.\n")
-		fmt.Fprintf(os.Stderr, "\nTo track files with Git LFS, run:\n")
-		fmt.Fprintf(os.Stderr, "  git lfs track \"*.extension\"\n")
+		fmt.Fprintf(os.Stderr, "\nLearn about Git LFS at:\n")
+		fmt.Fprintf(os.Stderr, "  https://www.mslinn.com/git/5100-git-lfs-overview.html\n")
 		os.Exit(1)
 	}
 }
