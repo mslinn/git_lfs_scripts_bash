@@ -15,6 +15,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/lithammer/dedent"
 	flag "github.com/spf13/pflag"
 )
 
@@ -105,12 +106,39 @@ func main() {
 
 func usage() {
 	nextVersion := getNextVersion()
-	fmt.Fprintf(os.Stderr, "Release a new version of Git LFS Scripts\n\n")
-	fmt.Fprintf(os.Stderr, "Usage: release [OPTIONS] [VERSION]\n\n")
-	fmt.Fprintf(os.Stderr, "OPTIONS:\n")
+	fmt.Fprint(os.Stderr, dedent.Dedent(fmt.Sprintf(`
+		Release a new version of Git LFS Scripts
+
+		USAGE:
+		  release [OPTIONS] [VERSION]
+
+		OPTIONS:
+	`)))
 	flag.PrintDefaults()
-	fmt.Fprintf(os.Stderr, "  -h, --help         Display this help message\n")
-	fmt.Fprintf(os.Stderr, "\nVERSION: The version to release (e.g., %s)\n", nextVersion)
+	fmt.Fprint(os.Stderr, dedent.Dedent(`
+		  -h, --help         Display this help message
+	`))
+	fmt.Fprintf(os.Stderr, dedent.Dedent(fmt.Sprintf(`
+
+		VERSION:
+		  The version to release (e.g., %s)
+
+		DESCRIPTION:
+		  Automates the release process including:
+		    - Version validation and management
+		    - Pre-release checks (branch, working directory, tags)
+		    - CHANGELOG.md verification
+		    - Test execution
+		    - VERSION file updates and commits
+		    - Git tag creation and pushing
+		    - GoReleaser execution for GitHub releases
+
+		EXAMPLES:
+		  ./release              # Interactive mode
+		  ./release 1.0.0        # Release specific version
+		  ./release -s 1.0.0     # Skip tests
+		  ./release -d 1.0.0     # Debug mode
+	`, nextVersion)))
 	os.Exit(0)
 }
 

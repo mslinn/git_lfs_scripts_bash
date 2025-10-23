@@ -22,7 +22,8 @@
       "Bash(./release:*)",
       "Bash(git commit:*)",
       "Bash(go build:*)",
-      "Bash(./build/git-delete-github-repo:*)"
+      "Bash(./build/git-delete-github-repo:*)",
+      "Read(//mnt/f/work/git/**)"
     ],
     "deny": [],
     "ask": []
