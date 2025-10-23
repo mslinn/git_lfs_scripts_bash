@@ -26,7 +26,9 @@
       "Read(//mnt/f/work/git/**)",
       "Bash(./build/git-giftless:*)",
       "Bash(./build/git-unmigrate:*)",
-      "Bash(./build/git-new-bare-repo:*)"
+      "Bash(./build/git-new-bare-repo:*)",
+      "Bash(./build/git-lfs-files:*)",
+      "Bash(./build/git-lfs-untrack:*)"
     ],
     "deny": [],
     "ask": []

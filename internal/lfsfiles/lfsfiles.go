@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/lithammer/dedent"
 )
 
 // CommandType represents the type of git command to execute
@@ -120,65 +122,155 @@ func GetCommandString(cmdType CommandType) string {
 // PrintHelp prints help message for the command
 func PrintHelp(cmdType CommandType) {
 	cmdName := ""
+	title := ""
 	switch cmdType {
 	case LsFiles:
 		cmdName = "git-ls-files"
+		title = "git-ls-files - Frontend for git ls-files with pattern permutation"
 	case LfsLsFiles:
 		cmdName = "git-lfs-files"
+		title = "git-lfs-files - Frontend for git lfs ls-files with pattern permutation"
 	case LfsTrack:
 		cmdName = "git-lfs-track"
+		title = "git-lfs-track - Frontend for git lfs track with pattern permutation"
 	case LfsUntrack:
 		cmdName = "git-lfs-untrack"
+		title = "git-lfs-untrack - Frontend for git lfs untrack with pattern permutation"
 	}
 
 	gitCmd := GetCommandString(cmdType)
 
-	description := ""
-	switch cmdType {
-	case LsFiles:
-		description = `git-ls-files - Invoke git ls-files with permutated wildmatch patterns.
+	// Build description based on command type
+	var helpText string
+	if cmdType == LsFiles {
+		helpText = fmt.Sprintf(`
+%s
 
-In addition to acting as a front-end to 'git ls-files', there are related
-commands for 'git lfs ls-files', 'git lfs track' and 'git lfs untrack'.
+USAGE:
+  %s [OPTIONS] PATTERN ...
 
-The front-end scripts permutate wildmatch patterns into a more general
-git ignore / git lfs pattern. They do not support all options supported by
-the commands that they invoke. You can, of course, run those commands when required.`
-	case LfsLsFiles:
-		description = "git-lfs-files - Invoke git lfs ls-files with permutated wildmatch patterns."
-	case LfsTrack:
-		description = "git-lfs-track - Invoke git lfs track with permutated wildmatch patterns."
-	case LfsUntrack:
-		description = "git-lfs-untrack - Invoke git lfs untrack with permutated wildmatch patterns."
+OPTIONS:
+  -c  Expand pattern to upper and lower case, helpful for media files
+  -d  Dry run (display filename patterns that would be affected)
+  -e  Apply the pattern everywhere (all directories in the Git repository)
+  -h  Show this help message
+
+DESCRIPTION:
+  This command acts as a frontend to 'git ls-files', permutating wildmatch
+  patterns into more general git ignore/git lfs patterns.
+
+  Related commands are available for:
+    - git lfs ls-files (git-lfs-files)
+    - git lfs track (git-lfs-track)
+    - git lfs untrack (git-lfs-untrack)
+
+  Note: These frontend scripts do not support all options of the underlying
+  commands. You can run the underlying commands directly when needed.
+
+EXAMPLES:
+  # Single pattern dry run
+  %s -d zip
+  # Output: DRY RUN: %s *.zip
+
+  # Multiple patterns
+  %s -d pdf zip
+  # Output: DRY RUN: %s *.pdf
+  #         DRY RUN: %s *.zip
+
+  # Case variations
+  %s -dc mp3
+  # Output: DRY RUN: %s *.mp3 *.MP3
+
+  # Multiple patterns with case variations
+  %s -dc mp3 mp4
+  # Output: DRY RUN: %s *.mp3 *.MP3
+  #         DRY RUN: %s *.mp4 *.MP4
+
+  # Apply everywhere in repository
+  %s -de zip
+  # Output: DRY RUN: %s *.zip **/*.zip
+
+  # Combined: everywhere + case variations
+  %s -dce mp3
+  # Output: DRY RUN: %s *.mp3 *.MP3 **/*.mp3 **/*.MP3
+
+  # Multiple patterns with all options
+  %s -dce mp3 mp4
+  # Output: DRY RUN: %s *.mp3 *.MP3 **/*.mp3 **/*.MP3
+  #         DRY RUN: %s *.mp4 *.MP4 **/*.mp4 **/*.MP4
+
+SEE ALSO:
+  Related commands: git-lfs-files, git-ls-files, git-lfs-track, git-unmigrate, git-lfs-untrack
+  Documentation: https://mslinn.com/git/5300-git-lfs-patterns-tracking.html
+`, title, cmdName,
+			cmdName, gitCmd,
+			cmdName, gitCmd, gitCmd,
+			cmdName, gitCmd,
+			cmdName, gitCmd, gitCmd,
+			cmdName, gitCmd,
+			cmdName, gitCmd,
+			cmdName, gitCmd, gitCmd)
+	} else {
+		helpText = fmt.Sprintf(`
+%s
+
+USAGE:
+  %s [OPTIONS] PATTERN ...
+
+OPTIONS:
+  -c  Expand pattern to upper and lower case, helpful for media files
+  -d  Dry run (display filename patterns that would be affected)
+  -e  Apply the pattern everywhere (all directories in the Git repository)
+  -h  Show this help message
+
+DESCRIPTION:
+  This command permutates wildmatch patterns for use with the underlying
+  Git or Git LFS command.
+
+EXAMPLES:
+  # Single pattern dry run
+  %s -d zip
+  # Output: DRY RUN: %s *.zip
+
+  # Multiple patterns
+  %s -d pdf zip
+  # Output: DRY RUN: %s *.pdf
+  #         DRY RUN: %s *.zip
+
+  # Case variations
+  %s -dc mp3
+  # Output: DRY RUN: %s *.mp3 *.MP3
+
+  # Multiple patterns with case variations
+  %s -dc mp3 mp4
+  # Output: DRY RUN: %s *.mp3 *.MP3
+  #         DRY RUN: %s *.mp4 *.MP4
+
+  # Apply everywhere in repository
+  %s -de zip
+  # Output: DRY RUN: %s *.zip **/*.zip
+
+  # Combined: everywhere + case variations
+  %s -dce mp3
+  # Output: DRY RUN: %s *.mp3 *.MP3 **/*.mp3 **/*.MP3
+
+  # Multiple patterns with all options
+  %s -dce mp3 mp4
+  # Output: DRY RUN: %s *.mp3 *.MP3 **/*.mp3 **/*.MP3
+  #         DRY RUN: %s *.mp4 *.MP4 **/*.mp4 **/*.MP4
+
+SEE ALSO:
+  Related commands: git-lfs-files, git-ls-files, git-lfs-track, git-unmigrate, git-lfs-untrack
+  Documentation: https://mslinn.com/git/5300-git-lfs-patterns-tracking.html
+`, title, cmdName,
+			cmdName, gitCmd,
+			cmdName, gitCmd, gitCmd,
+			cmdName, gitCmd,
+			cmdName, gitCmd, gitCmd,
+			cmdName, gitCmd,
+			cmdName, gitCmd,
+			cmdName, gitCmd, gitCmd)
 	}
 
-	fmt.Printf("%s\n\n", description)
-	fmt.Printf("Syntax:\n")
-	fmt.Printf("  %s [OPTIONS] PATTERN ...\n\n", cmdName)
-	fmt.Printf("OPTIONS:\n")
-	fmt.Printf("  -c  Expand pattern to upper and lower case, helpful for media files\n")
-	fmt.Printf("  -d  Dry run (display filename patterns that would be affected)\n")
-	fmt.Printf("  -e  Apply the pattern everywhere (all directories in the Git repository)\n")
-	fmt.Printf("  -h  Show this help message\n\n")
-	fmt.Printf("Examples:\n")
-	fmt.Printf("  $ %s -d zip\n", cmdName)
-	fmt.Printf("  DRY RUN: %s *.zip\n\n", gitCmd)
-	fmt.Printf("  $ %s -d pdf zip\n", cmdName)
-	fmt.Printf("  DRY RUN: %s *.pdf\n", gitCmd)
-	fmt.Printf("  DRY RUN: %s *.zip\n\n", gitCmd)
-	fmt.Printf("  $ %s -dc mp3\n", cmdName)
-	fmt.Printf("  DRY RUN: %s *.mp3 *.MP3\n\n", gitCmd)
-	fmt.Printf("  $ %s -dc mp3 mp4\n", cmdName)
-	fmt.Printf("  DRY RUN: %s *.mp3 *.MP3\n", gitCmd)
-	fmt.Printf("  DRY RUN: %s *.mp4 *.MP4\n\n", gitCmd)
-	fmt.Printf("  $ %s -de zip\n", cmdName)
-	fmt.Printf("  DRY RUN: %s *.zip **/*.zip\n\n", gitCmd)
-	fmt.Printf("  $ %s -dce mp3\n", cmdName)
-	fmt.Printf("  DRY RUN: %s *.mp3 *.MP3 **/*.mp3 **/*.MP3\n\n", gitCmd)
-	fmt.Printf("  $ %s -dce mp3 mp4\n", cmdName)
-	fmt.Printf("  DRY RUN: %s *.mp3 *.MP3 **/*.mp3 **/*.MP3\n", gitCmd)
-	fmt.Printf("  DRY RUN: %s *.mp4 *.MP4 **/*.mp4 **/*.MP4\n\n", gitCmd)
-	fmt.Printf("See also:\n")
-	fmt.Printf("  Related commands: git-lfs-files, git-ls-files, git-lfs-track, git-unmigrate, and git-lfs-untrack.\n")
-	fmt.Printf("  https://mslinn.com/git/5300-git-lfs-patterns-tracking.html\n")
+	fmt.Print(dedent.Dedent(helpText))
 }
