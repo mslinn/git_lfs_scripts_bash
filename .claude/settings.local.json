@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//mnt/f/work/git/git-lfs-test/cmd/lfst/**)",
+      "Read(//mnt/f/work/git/git_tree_go/cmd/git-update/**)",
+      "Bash(go mod init:*)",
+      "Bash(mkdir:*)",
+      "Bash(go mod tidy:*)",
+      "Bash(make build:*)",
+      "Bash(./build/git-ls-files:*)",
+      "Bash(./build/git-nonlfs:*)",
+      "Bash(./build/git-lfs-track:*)",
+      "Bash(tree:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

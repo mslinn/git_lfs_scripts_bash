@@ -8,3 +8,12 @@
 ~*
 .DS_Store
 .idea
+
+# Go build artifacts
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+go.work
