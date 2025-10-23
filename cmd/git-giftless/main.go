@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/lithammer/dedent"
@@ -141,6 +142,7 @@ func printHelp() {
 
 func checkPrerequisites() {
 	var missing []string
+	var missingPackages []string
 
 	// Check Python 3
 	if err := checkCommand("python3", "--version"); err != nil {
@@ -173,18 +175,21 @@ func checkPrerequisites() {
 
 	for _, dep := range deps {
 		if err := checkCommand("python3", "-c", "import "+dep.module); err != nil {
-			missing = append(missing, dep.pkg+" (install with: pip install "+dep.pkg+")")
+			missing = append(missing, dep.pkg)
+			missingPackages = append(missingPackages, dep.pkg)
 		}
 	}
 
 	// Check giftless
 	if err := checkCommand("python3", "-c", "import giftless"); err != nil {
-		missing = append(missing, "giftless (install with: pip install giftless)")
+		missing = append(missing, "giftless")
+		missingPackages = append(missingPackages, "giftless")
 	}
 
 	// Check uwsgi
 	if err := checkCommand("uwsgi", "--version"); err != nil {
-		missing = append(missing, "uwsgi (install with: pip install uwsgi)")
+		missing = append(missing, "uwsgi")
+		missingPackages = append(missingPackages, "uwsgi")
 	}
 
 	if len(missing) > 0 {
@@ -192,7 +197,8 @@ func checkPrerequisites() {
 		for _, dep := range missing {
 			fmt.Fprintf(os.Stderr, "  ✗ %s\n", dep)
 		}
-		fmt.Fprintf(os.Stderr, "\nPlease install all dependencies before running git-giftless.\n")
+		fmt.Fprintf(os.Stderr, "\nTo install all missing dependencies, run:\n")
+		fmt.Fprintf(os.Stderr, "  pip install %s\n", strings.Join(missingPackages, " "))
 		os.Exit(1)
 	}
 
