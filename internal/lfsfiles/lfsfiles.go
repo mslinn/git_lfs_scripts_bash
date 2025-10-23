@@ -211,65 +211,65 @@ func PrintHelp(cmdType CommandType) {
 			cmdName, gitCmd,
 			cmdName, gitCmd, gitCmd))
 	} else {
-		helpText = fmt.Sprintf(`
-%s
+		helpText = dedent.Dedent(fmt.Sprintf(`
+			%s
 
-USAGE:
-  %s [OPTIONS] PATTERN ...
+			USAGE:
+			  %s [OPTIONS] PATTERN ...
 
-OPTIONS:
-  -c  Expand pattern to upper and lower case, helpful for media files
-  -d  Dry run (display filename patterns that would be affected)
-  -e  Apply the pattern everywhere (all directories in the Git repository)
-  -h  Show this help message
+			OPTIONS:
+			  -c  Expand pattern to upper and lower case, helpful for media files
+			  -d  Dry run (display filename patterns that would be affected)
+			  -e  Apply the pattern everywhere (all directories in the Git repository)
+			  -h  Show this help message
 
-DESCRIPTION:
-  This command permutates wildmatch patterns for use with the underlying
-  Git or Git LFS command.
+			DESCRIPTION:
+			  This command permutates wildmatch patterns for use with the underlying
+			  Git or Git LFS command.
 
-EXAMPLES:
-  # Single pattern dry run
-  %s -d zip
-  # Output: DRY RUN: %s *.zip
+			EXAMPLES:
+			  # Single pattern dry run
+			  %s -d zip
+			  # Output: DRY RUN: %s *.zip
 
-  # Multiple patterns
-  %s -d pdf zip
-  # Output: DRY RUN: %s *.pdf
-  #         DRY RUN: %s *.zip
+			  # Multiple patterns
+			  %s -d pdf zip
+			  # Output: DRY RUN: %s *.pdf
+			  #         DRY RUN: %s *.zip
 
-  # Case variations
-  %s -dc mp3
-  # Output: DRY RUN: %s *.mp3 *.MP3
+			  # Case variations
+			  %s -dc mp3
+			  # Output: DRY RUN: %s *.mp3 *.MP3
 
-  # Multiple patterns with case variations
-  %s -dc mp3 mp4
-  # Output: DRY RUN: %s *.mp3 *.MP3
-  #         DRY RUN: %s *.mp4 *.MP4
+			  # Multiple patterns with case variations
+			  %s -dc mp3 mp4
+			  # Output: DRY RUN: %s *.mp3 *.MP3
+			  #         DRY RUN: %s *.mp4 *.MP4
 
-  # Apply everywhere in repository
-  %s -de zip
-  # Output: DRY RUN: %s *.zip **/*.zip
+			  # Apply everywhere in repository
+			  %s -de zip
+			  # Output: DRY RUN: %s *.zip **/*.zip
 
-  # Combined: everywhere + case variations
-  %s -dce mp3
-  # Output: DRY RUN: %s *.mp3 *.MP3 **/*.mp3 **/*.MP3
+			  # Combined: everywhere + case variations
+			  %s -dce mp3
+			  # Output: DRY RUN: %s *.mp3 *.MP3 **/*.mp3 **/*.MP3
 
-  # Multiple patterns with all options
-  %s -dce mp3 mp4
-  # Output: DRY RUN: %s *.mp3 *.MP3 **/*.mp3 **/*.MP3
-  #         DRY RUN: %s *.mp4 *.MP4 **/*.mp4 **/*.MP4
+			  # Multiple patterns with all options
+			  %s -dce mp3 mp4
+			  # Output: DRY RUN: %s *.mp3 *.MP3 **/*.mp3 **/*.MP3
+			  #         DRY RUN: %s *.mp4 *.MP4 **/*.mp4 **/*.MP4
 
-SEE ALSO:
-  Related commands: git-lfs-files, git-ls-files, git-lfs-track, git-unmigrate, git-lfs-untrack
-  Documentation: https://mslinn.com/git/5300-git-lfs-patterns-tracking.html
-`, title, cmdName,
+			SEE ALSO:
+			  Related commands: git-lfs-files, git-ls-files, git-lfs-track, git-unmigrate, git-lfs-untrack
+			  Documentation: https://mslinn.com/git/5300-git-lfs-patterns-tracking.html
+			`, title, cmdName,
 			cmdName, gitCmd,
 			cmdName, gitCmd, gitCmd,
 			cmdName, gitCmd,
 			cmdName, gitCmd, gitCmd,
 			cmdName, gitCmd,
 			cmdName, gitCmd,
-			cmdName, gitCmd, gitCmd)
+			cmdName, gitCmd, gitCmd))
 	}
 
 	fmt.Print(helpText)
