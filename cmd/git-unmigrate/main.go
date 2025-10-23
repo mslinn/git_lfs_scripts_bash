@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
@@ -39,10 +38,14 @@ func main() {
 	}
 
 	// Check if git-lfs is installed
-	checkGitLFS()
+	if err := common.CheckLFSInstalled(); err != nil {
+		common.PrintError("%v", err)
+	}
 
 	// Check if LFS is initialized in this repo
-	checkLFSInitialized()
+	if err := common.CheckLFSInitialized(); err != nil {
+		common.PrintError("%v", err)
+	}
 
 	opts := lfsfiles.Options{
 		BothCases:  bothCases,
@@ -154,50 +157,6 @@ func printHelp() {
 		SEE ALSO:
 		  git-ls-files, git-lfs-track, git-lfs-untrack
 	`))
-}
-
-func checkGitLFS() {
-	cmd := exec.Command("git", "lfs", "version")
-	if err := cmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: Git LFS is not installed or not available.\n")
-		fmt.Fprintf(os.Stderr, "Install from: https://git-lfs.com/\n")
-		os.Exit(1)
-	}
-}
-
-func checkLFSInitialized() {
-	// Check if .gitattributes exists and has LFS patterns
-	file, err := os.Open(".gitattributes")
-	if os.IsNotExist(err) {
-		fmt.Fprintf(os.Stderr, "Error: Git LFS is not configured for this repository.\n")
-		fmt.Fprintf(os.Stderr, "No .gitattributes file found.\n")
-		fmt.Fprintf(os.Stderr, "\nLearn about Git LFS at:\n")
-		fmt.Fprintf(os.Stderr, "  https://www.mslinn.com/git/5100-git-lfs-overview.html\n")
-		os.Exit(1)
-	}
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading .gitattributes: %v\n", err)
-		os.Exit(1)
-	}
-	defer file.Close()
-
-	// Check if .gitattributes contains any LFS patterns
-	scanner := bufio.NewScanner(file)
-	hasLFSPattern := false
-	for scanner.Scan() {
-		if strings.Contains(scanner.Text(), "filter=lfs") {
-			hasLFSPattern = true
-			break
-		}
-	}
-
-	if !hasLFSPattern {
-		fmt.Fprintf(os.Stderr, "Error: Git LFS is not configured for this repository.\n")
-		fmt.Fprintf(os.Stderr, "No LFS tracked patterns found in .gitattributes.\n")
-		fmt.Fprintf(os.Stderr, "\nLearn about Git LFS at:\n")
-		fmt.Fprintf(os.Stderr, "  https://www.mslinn.com/git/5100-git-lfs-overview.html\n")
-		os.Exit(1)
-	}
 }
 
 func runGitCommand(args ...string) error {

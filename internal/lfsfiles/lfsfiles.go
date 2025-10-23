@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/lithammer/dedent"
+	"github.com/mslinn/git_lfs_scripts/internal/common"
 )
 
 // CommandType represents the type of git command to execute
@@ -66,6 +67,22 @@ func ExpandPattern(pattern string, opts Options) []string {
 
 // Execute runs the git command with expanded patterns
 func Execute(patterns []string, opts Options) error {
+	// Check if this is an LFS command (not regular git ls-files)
+	if strings.Contains(opts.Command, "lfs") {
+		// Check LFS is installed
+		if err := common.CheckLFSInstalled(); err != nil {
+			return err
+		}
+
+		// For track/untrack commands, check LFS is initialized
+		// (ls-files can work without initialization to show nothing tracked)
+		if strings.Contains(opts.Command, "track") || strings.Contains(opts.Command, "untrack") {
+			if err := common.CheckLFSInitialized(); err != nil {
+				return err
+			}
+		}
+	}
+
 	if opts.DryRun {
 		for _, pattern := range patterns {
 			expanded := ExpandPattern(pattern, opts)
