@@ -23,6 +23,12 @@ func main() {
 
 	repoPath := flag.Arg(0)
 
+	// Validate input
+	if repoPath == "." || repoPath == ".." || repoPath == "/" {
+		printHelp(fmt.Sprintf("Error: Invalid repository path '%s'.\nPlease provide a specific repository name or path.", repoPath))
+		os.Exit(1)
+	}
+
 	// Check prerequisites
 	checkPrerequisites()
 
@@ -30,8 +36,10 @@ func main() {
 	ensureGitAccessGroup()
 
 	// Parse repo path and name
-	dir := filepath.Dir(repoPath)
-	name := filepath.Base(repoPath)
+	// Clean the path first to handle relative paths properly
+	cleanPath := filepath.Clean(repoPath)
+	dir := filepath.Dir(cleanPath)
+	name := filepath.Base(cleanPath)
 
 	// Add .git suffix if not present
 	if !strings.HasSuffix(name, ".git") {
@@ -39,6 +47,13 @@ func main() {
 	}
 
 	fullPath := filepath.Join(dir, name)
+
+	// Convert to absolute path for clarity
+	absPath, err := filepath.Abs(fullPath)
+	if err != nil {
+		common.PrintError("Failed to resolve absolute path: %v", err)
+	}
+	fullPath = absPath
 
 	// Check if repo already exists
 	if _, err := os.Stat(fullPath); err == nil {
