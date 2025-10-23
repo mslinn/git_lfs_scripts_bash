@@ -74,12 +74,9 @@ func Execute(patterns []string, opts Options) error {
 			return err
 		}
 
-		// For track/untrack commands, check LFS is initialized
-		// (ls-files can work without initialization to show nothing tracked)
-		if strings.Contains(opts.Command, "track") || strings.Contains(opts.Command, "untrack") {
-			if err := common.CheckLFSInitialized(); err != nil {
-				return err
-			}
+		// Check LFS is initialized for all LFS commands
+		if err := common.CheckLFSInitialized(); err != nil {
+			return err
 		}
 	}
 
