@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/lithammer/dedent"
 	"github.com/mslinn/git_lfs_scripts/internal/common"
 )
 
@@ -21,6 +22,9 @@ func main() {
 	}
 
 	repoPath := flag.Arg(0)
+
+	// Check prerequisites
+	checkPrerequisites()
 
 	// Ensure git_access group exists
 	ensureGitAccessGroup()
@@ -89,27 +93,86 @@ func printHelp(msg string) {
 		fmt.Println()
 	}
 
-	fmt.Println("git-new-bare-repo - Create a new bare Git repository")
-	fmt.Println()
-	fmt.Println("Syntax: git new-bare-repo [OPTIONS] /path/to/new/repo.git")
-	fmt.Println()
-	fmt.Println("OPTIONS:")
-	fmt.Println("  -h  Show this help message")
-	fmt.Println()
-	fmt.Println("Normally this script would be run on a Git server, because")
-	fmt.Println("that is where bare Git repositories normally live.")
-	fmt.Println()
-	fmt.Println("A new Git repository will be created in /path/to/new/repo.git,")
-	fmt.Println("which should not already exist.")
-	fmt.Println()
-	fmt.Println("The SGID permission for the new Git repository will be set for group git_access,")
-	fmt.Println("which is created if it does not exist.")
-	fmt.Println()
-	fmt.Println("The parent directory (/path/to/new/) will be created if it does not already exist.")
-	fmt.Println("The name of the repo must not contain spaces.")
-	fmt.Println("If the specified name does not end with a .git suffix, the suffix is appended.")
-	fmt.Println()
-	fmt.Println("Git configuration parameter 'receive.denyCurrentBranch' is set to ignore.")
+	fmt.Print(dedent.Dedent(`
+		git-new-bare-repo - Create a new bare Git repository
+
+		USAGE:
+		  git new-bare-repo [OPTIONS] /path/to/new/repo.git
+
+		OPTIONS:
+		  -h  Show this help message
+
+		DESCRIPTION:
+		  Creates a new bare Git repository, typically run on a Git server where bare
+		  repositories normally live.
+
+		  The new repository will be created at the specified path (which must not
+		  already exist). The SGID permission will be set for group git_access, which
+		  is created if it does not exist.
+
+		  Features:
+		    - Parent directories are created automatically if needed
+		    - .git suffix is appended if not specified
+		    - Shared repository permissions (--shared=everybody)
+		    - Sets receive.denyCurrentBranch to ignore
+
+		  Note: Repository names must not contain spaces.
+
+		REQUIREMENTS:
+		  - Git
+		  - sudo (for group management operations)
+		  - getent (for checking group existence)
+		  - groupadd (for creating git_access group)
+		  - chgrp (for setting group ownership)
+
+		EXAMPLES:
+		  # Create a repository (adds .git automatically)
+		  git new-bare-repo /srv/git/myproject
+
+		  # Create with explicit .git suffix
+		  git new-bare-repo /srv/git/myproject.git
+
+		  # Create in a nested path (parent dirs created automatically)
+		  git new-bare-repo /srv/git/team/project.git
+	`))
+}
+
+func checkPrerequisites() {
+	var missing []string
+
+	// Check git
+	if _, err := exec.LookPath("git"); err != nil {
+		missing = append(missing, "git (install from: https://git-scm.com/)")
+	}
+
+	// Check sudo
+	if _, err := exec.LookPath("sudo"); err != nil {
+		missing = append(missing, "sudo (required for group management)")
+	}
+
+	// Check getent
+	if _, err := exec.LookPath("getent"); err != nil {
+		missing = append(missing, "getent (usually part of glibc-common)")
+	}
+
+	// Check groupadd
+	if _, err := exec.LookPath("groupadd"); err != nil {
+		missing = append(missing, "groupadd (usually part of shadow-utils)")
+	}
+
+	// Check chgrp
+	if _, err := exec.LookPath("chgrp"); err != nil {
+		missing = append(missing, "chgrp (usually part of coreutils)")
+	}
+
+	if len(missing) > 0 {
+		fmt.Fprintf(os.Stderr, "Error: Missing required commands:\n")
+		for _, cmd := range missing {
+			fmt.Fprintf(os.Stderr, "  ✗ %s\n", cmd)
+		}
+		fmt.Fprintf(os.Stderr, "\nPlease install missing dependencies before running git-new-bare-repo.\n")
+		os.Exit(1)
+	}
 }
 
 func ensureGitAccessGroup() {

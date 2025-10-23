@@ -50,6 +50,7 @@ make install INSTALL_DIR=/usr/local/bin
 ### Testing
 
 All commands built successfully and tested:
+
 - Help output verified for all commands
 - Pattern expansion working correctly
 - Dry-run functionality tested

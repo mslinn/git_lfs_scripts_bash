@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/lithammer/dedent"
 	"github.com/mslinn/git_lfs_scripts/internal/common"
 )
 
@@ -56,15 +57,34 @@ func main() {
 }
 
 func printHelp() {
-	fmt.Println("git-nonlfs - List files that are not managed by Git LFS")
-	fmt.Println()
-	fmt.Println("Usage: git nonlfs [OPTIONS]")
-	fmt.Println()
-	fmt.Println("OPTIONS:")
-	fmt.Println("  -h  Show this help message")
-	fmt.Println()
-	fmt.Println("This command lists all files in the repository that are not tracked by Git LFS.")
-	fmt.Println("It reads .gitattributes to determine which patterns are tracked by LFS.")
+	fmt.Print(dedent.Dedent(`
+		git-nonlfs - List files that are not managed by Git LFS
+
+		USAGE:
+		  git nonlfs [OPTIONS]
+
+		OPTIONS:
+		  -h  Show this help message
+
+		DESCRIPTION:
+		  This command lists all files in the repository that are not tracked by Git LFS.
+		  It reads .gitattributes to determine which patterns are tracked by LFS, then
+		  lists all files that don't match those patterns.
+
+		  Requires:
+		    - Git repository
+		    - find command (standard on Unix/Linux/macOS)
+
+		EXAMPLES:
+		  # List all non-LFS files
+		  git nonlfs
+
+		  # Count non-LFS files
+		  git nonlfs | wc -l
+
+		  # Find large non-LFS files
+		  git nonlfs | xargs du -h | sort -hr | head -10
+	`))
 }
 
 func getAllFiles() ([]string, error) {

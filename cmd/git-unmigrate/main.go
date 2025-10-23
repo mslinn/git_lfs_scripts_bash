@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/lithammer/dedent"
 	"github.com/mslinn/git_lfs_scripts/internal/common"
 	"github.com/mslinn/git_lfs_scripts/internal/lfsfiles"
 )
@@ -35,6 +36,9 @@ func main() {
 	if err := common.CheckGitRepo(); err != nil {
 		common.PrintError("%v", err)
 	}
+
+	// Check if git-lfs is installed
+	checkGitLFS()
 
 	opts := lfsfiles.Options{
 		BothCases:  bothCases,
@@ -91,44 +95,70 @@ func main() {
 }
 
 func printHelp() {
-	fmt.Println("git-unmigrate - Move matching files from Git LFS to Git")
-	fmt.Println()
-	fmt.Println("By default, only files in the current directory that match one of the")
-	fmt.Println("specified filetypes are processed.")
-	fmt.Println()
-	fmt.Println("This process does not rewrite Git history, so other Git users will not need")
-	fmt.Println("to re-clone the repository after this process concludes.")
-	fmt.Println()
-	fmt.Println("This process might take a long time if you have a lot of large files to")
-	fmt.Println("unmigrate back to Git.")
-	fmt.Println()
-	fmt.Println("Syntax:")
-	fmt.Println("  git unmigrate [OPTIONS] PATTERN ...")
-	fmt.Println()
-	fmt.Println("OPTIONS:")
-	fmt.Println("  -c  Expand pattern to upper and lower case, helpful for media files")
-	fmt.Println("  -d  Dry run (display filename patterns that would be affected)")
-	fmt.Println("  -e  Apply the pattern everywhere (all directories in the Git repository)")
-	fmt.Println("  -h  Show this help message")
-	fmt.Println()
-	fmt.Println("Examples:")
-	fmt.Println("  $ git unmigrate -d zip")
-	fmt.Println("  DRY RUN: git lfs untrack *.zip")
-	fmt.Println()
-	fmt.Println("  $ git unmigrate -d pdf zip")
-	fmt.Println("  DRY RUN: git lfs untrack *.pdf")
-	fmt.Println("  DRY RUN: git lfs untrack *.zip")
-	fmt.Println()
-	fmt.Println("  $ git unmigrate -dc mp3")
-	fmt.Println("  DRY RUN: git lfs untrack *.mp3 *.MP3")
-	fmt.Println()
-	fmt.Println("  $ git unmigrate -de zip")
-	fmt.Println("  DRY RUN: git lfs untrack *.zip **/*.zip")
-	fmt.Println()
-	fmt.Println("  $ git unmigrate -dce mp3")
-	fmt.Println("  DRY RUN: git lfs untrack *.mp3 *.MP3 **/*.mp3 **/*.MP3")
-	fmt.Println()
-	fmt.Println("See also: git-ls-files, git-lfs-track, and git-lfs-untrack")
+	fmt.Print(dedent.Dedent(`
+		git-unmigrate - Move matching files from Git LFS back to Git
+
+		USAGE:
+		  git unmigrate [OPTIONS] PATTERN ...
+
+		OPTIONS:
+		  -c  Expand pattern to upper and lower case, helpful for media files
+		  -d  Dry run (display filename patterns that would be affected)
+		  -e  Apply the pattern everywhere (all directories in the Git repository)
+		  -h  Show this help message
+
+		DESCRIPTION:
+		  This command reverses 'git lfs migrate import' by moving files back to regular
+		  Git tracking. By default, only files in the current directory matching the
+		  specified patterns are processed.
+
+		  This process does NOT rewrite Git history, so other Git users will not need
+		  to re-clone the repository after this process concludes.
+
+		  Note: This process might take a long time if you have many large files to
+		  unmigrate back to Git.
+
+		REQUIREMENTS:
+		  - Git repository
+		  - Git LFS installed and configured
+
+		EXAMPLES:
+		  # Dry run - see what would happen
+		  git unmigrate -d zip
+		  # Output: DRY RUN: git lfs untrack *.zip
+
+		  # Unmigrate multiple patterns
+		  git unmigrate -d pdf zip
+		  # Output: DRY RUN: git lfs untrack *.pdf
+		  #         DRY RUN: git lfs untrack *.zip
+
+		  # Unmigrate with case variations
+		  git unmigrate -dc mp3
+		  # Output: DRY RUN: git lfs untrack *.mp3 *.MP3
+
+		  # Apply everywhere in repository
+		  git unmigrate -de zip
+		  # Output: DRY RUN: git lfs untrack *.zip **/*.zip
+
+		  # Combined options
+		  git unmigrate -dce mp3
+		  # Output: DRY RUN: git lfs untrack *.mp3 *.MP3 **/*.mp3 **/*.MP3
+
+		  # Actually unmigrate (remove -d flag)
+		  git unmigrate zip
+
+		SEE ALSO:
+		  git-ls-files, git-lfs-track, git-lfs-untrack
+	`))
+}
+
+func checkGitLFS() {
+	cmd := exec.Command("git", "lfs", "version")
+	if err := cmd.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: Git LFS is not installed or not available.\n")
+		fmt.Fprintf(os.Stderr, "Install from: https://git-lfs.com/\n")
+		os.Exit(1)
+	}
 }
 
 func runGitCommand(args ...string) error {

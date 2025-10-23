@@ -24,7 +24,9 @@
       "Bash(go build:*)",
       "Bash(./build/git-delete-github-repo:*)",
       "Read(//mnt/f/work/git/**)",
-      "Bash(./build/git-giftless:*)"
+      "Bash(./build/git-giftless:*)",
+      "Bash(./build/git-unmigrate:*)",
+      "Bash(./build/git-new-bare-repo:*)"
     ],
     "deny": [],
     "ask": []
