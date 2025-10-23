@@ -401,8 +401,8 @@ func runGoReleaser(version string, debug bool) {
 	if err != nil {
 		needsInstall = true
 	} else {
-		// Check if it's v2 or later
-		if !strings.Contains(output, "goreleaser version v2") && !strings.Contains(output, "goreleaser version 2") {
+		// Check if it's v2 or later by looking for "GitVersion: v2" or "GitVersion:    v2"
+		if !strings.Contains(output, "GitVersion:") || !strings.Contains(output, "v2.") {
 			warning("Found older version of goreleaser, upgrading to v2...")
 			needsInstall = true
 		}
