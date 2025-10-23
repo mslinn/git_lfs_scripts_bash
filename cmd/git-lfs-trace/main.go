@@ -3,8 +3,11 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"os"
+
+	"github.com/lithammer/dedent"
 )
 
 // Request represents a Git LFS transfer request
@@ -21,7 +24,57 @@ type Response struct {
 	Objects []map[string]interface{} `json:"objects,omitempty"`
 }
 
+func printHelp() {
+	fmt.Print(dedent.Dedent(`
+		git-lfs-trace - Debug Git LFS transfer adapter operations
+
+		USAGE:
+		  git lfs-trace [OPTIONS]
+
+		OPTIONS:
+		  -h, --help       Show this help message
+
+		DESCRIPTION:
+		  This command acts as a Git LFS custom transfer adapter that logs all
+		  requests and responses to stderr for debugging purposes. It reads JSON
+		  requests from stdin and writes JSON responses to stdout.
+
+		  This is useful for understanding how Git LFS communicates with transfer
+		  adapters and for debugging custom transfer adapter implementations.
+
+		SUPPORTED EVENTS:
+		  - init:       Initialize the transfer adapter
+		  - terminate:  Terminate the transfer adapter
+		  - upload:     Handle file upload requests
+		  - download:   Handle file download requests
+
+		EXAMPLES:
+		  # Configure Git LFS to use this trace adapter
+		  git config lfs.customtransfer.trace.path git-lfs-trace
+		  git config lfs.standalonetransferagent trace
+
+		  # Push files and observe the LFS protocol
+		  git push
+
+		  # Remove trace configuration
+		  git config --unset lfs.customtransfer.trace.path
+		  git config --unset lfs.standalonetransferagent
+
+		NOTE:
+		  This adapter logs all protocol messages but does not actually
+		  transfer files. It's intended for educational and debugging purposes.
+	`))
+}
+
 func main() {
+	showHelp := flag.Bool("h", false, "Show help message")
+	flag.Parse()
+
+	if *showHelp {
+		printHelp()
+		os.Exit(0)
+	}
+
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for scanner.Scan() {
