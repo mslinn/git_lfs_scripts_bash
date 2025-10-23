@@ -8,18 +8,18 @@ These tools were written along with the miniseries of articles about
 
 ## Commands
 
-All commands are invoked as Git subcommands (e.g., `git ls-files`, `git nonlfs`):
+All commands can be invoked as Git subcommands (e.g., `git ls-files`, `git nonlfs`):
 
 * `git-delete-github-repo` - Deletes the given GitHub repo without prompting (requires `gh` CLI)
-* `git-giftless` - Run Giftless Git LFS server (requires Python with giftless and uwsgi)
-* `git-lfs-trace` - Git LFS transfer adapter that reports activity between Git client and LFS server
-* `git-ls-files` - Frontend for `git ls-files` with pattern permutation
-* `git-lfs-files` - Frontend for `git lfs ls-files` with pattern permutation
-* `git-lfs-track` - Frontend for `git lfs track` with pattern permutation
-* `git-lfs-untrack` - Frontend for `git lfs untrack` with pattern permutation
-* `git-new-bare-repo` - Creates a bare Git repository
-* `git-nonlfs` - Lists files that are not in Git LFS
-* `git-unmigrate` - Reverses `git lfs migrate import` for given wildmatch patterns
+* `git-giftless`           - Run Giftless Git LFS server (requires Python with giftless and uwsgi)
+* `git-lfs-trace`          - Git LFS transfer adapter that reports activity between Git client and LFS server
+* `git-ls-files`           - Frontend for `git ls-files` with pattern permutation
+* `git-lfs-files`          - Frontend for `git lfs ls-files` with pattern permutation
+* `git-lfs-track`          - Frontend for `git lfs track` with pattern permutation
+* `git-lfs-untrack`        - Frontend for `git lfs untrack` with pattern permutation
+* `git-new-bare-repo`      - Creates a bare Git repository
+* `git-nonlfs`             - Lists files that are not in Git LFS
+* `git-unmigrate`          - Reverses `git lfs migrate import` for given wildmatch patterns
 
 
 ## Installation
@@ -100,9 +100,9 @@ git unmigrate -ce mp3
 Commands that support pattern permutation (`git-ls-files`, `git-lfs-files`, `git-lfs-track`, `git-lfs-untrack`) support:
 
 * `-c`, `--bothcases` - Expand pattern to upper and lower case (useful for media files)
-* `-d`, `--dryrun` - Show what would be done without executing
+* `-d`, `--dryrun`     - Show what would be done without executing
 * `-e`, `--everywhere` - Apply pattern recursively in all directories
-* `-h`, `--help` - Show help message
+* `-h`, `--help`       - Show help message
 
 Flags can be combined (e.g., `-dce`) or used separately (e.g., `-d -c -e`).
 

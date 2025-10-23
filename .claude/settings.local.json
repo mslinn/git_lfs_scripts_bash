@@ -31,7 +31,9 @@
       "Bash(./build/git-lfs-untrack:*)",
       "Bash(grep:*)",
       "Bash(git pull:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(make install:*)",
+      "Bash(git lfs-track:*)"
     ],
     "deny": [],
     "ask": []
