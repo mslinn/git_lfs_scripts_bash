@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+
+	"github.com/lithammer/dedent"
 )
 
 // DeleteRepo deletes a GitHub repository using the gh CLI
@@ -76,14 +78,14 @@ func installGHLinux() error {
 
 	// Execute installation script as a single command
 	// Based on: https://github.com/cli/cli/blob/trunk/docs/install_linux.md
-	script := `
-type -p curl >/dev/null || (sudo apt-get update && sudo apt-get install -y curl)
-curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-sudo apt-get update
-sudo apt-get install -y gh
-`
+	script := dedent.Dedent(`
+		type -p curl >/dev/null || (sudo apt-get update && sudo apt-get install -y curl)
+		curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+		sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+		echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+		sudo apt-get update
+		sudo apt-get install -y gh
+		`)
 	if isSudo {
 		script = strings.ReplaceAll(script, "sudo ", "")
 	}
