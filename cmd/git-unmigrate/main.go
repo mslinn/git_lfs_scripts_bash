@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
@@ -39,6 +40,9 @@ func main() {
 
 	// Check if git-lfs is installed
 	checkGitLFS()
+
+	// Check if LFS is initialized in this repo
+	checkLFSInitialized()
 
 	opts := lfsfiles.Options{
 		BothCases:  bothCases,
@@ -157,6 +161,42 @@ func checkGitLFS() {
 	if err := cmd.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: Git LFS is not installed or not available.\n")
 		fmt.Fprintf(os.Stderr, "Install from: https://git-lfs.com/\n")
+		os.Exit(1)
+	}
+}
+
+func checkLFSInitialized() {
+	// Check if .gitattributes exists and has LFS patterns
+	file, err := os.Open(".gitattributes")
+	if os.IsNotExist(err) {
+		fmt.Fprintf(os.Stderr, "Error: Git LFS is not configured for this repository.\n")
+		fmt.Fprintf(os.Stderr, "No .gitattributes file found.\n")
+		fmt.Fprintf(os.Stderr, "\nTo set up Git LFS, run:\n")
+		fmt.Fprintf(os.Stderr, "  git lfs install\n")
+		fmt.Fprintf(os.Stderr, "  git lfs track \"*.extension\"\n")
+		os.Exit(1)
+	}
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error reading .gitattributes: %v\n", err)
+		os.Exit(1)
+	}
+	defer file.Close()
+
+	// Check if .gitattributes contains any LFS patterns
+	scanner := bufio.NewScanner(file)
+	hasLFSPattern := false
+	for scanner.Scan() {
+		if strings.Contains(scanner.Text(), "filter=lfs") {
+			hasLFSPattern = true
+			break
+		}
+	}
+
+	if !hasLFSPattern {
+		fmt.Fprintf(os.Stderr, "Error: Git LFS is not configured for this repository.\n")
+		fmt.Fprintf(os.Stderr, "No LFS tracked patterns found in .gitattributes.\n")
+		fmt.Fprintf(os.Stderr, "\nTo track files with Git LFS, run:\n")
+		fmt.Fprintf(os.Stderr, "  git lfs track \"*.extension\"\n")
 		os.Exit(1)
 	}
 }
