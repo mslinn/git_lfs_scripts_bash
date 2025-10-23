@@ -360,15 +360,20 @@ func updateVersionFiles(version string) {
 	}
 	success("Binaries rebuilt with new version")
 
-	// Commit VERSION file change
+	// Commit VERSION file change if there are changes
 	runCommandVerbose("git", "add", "VERSION")
-	if err := runCommandVerbose("git", "commit", "-m", fmt.Sprintf("Bump version to %s", version)); err != nil {
-		errorExit("Failed to commit VERSION file")
+	status, _ := runCommand("git", "status", "--porcelain", "VERSION")
+	if status != "" {
+		if err := runCommandVerbose("git", "commit", "-m", fmt.Sprintf("Bump version to %s", version)); err != nil {
+			errorExit("Failed to commit VERSION file")
+		}
+		if err := runCommandVerbose("git", "push", "origin"); err != nil {
+			errorExit("Failed to push VERSION file")
+		}
+		success("VERSION file committed and pushed")
+	} else {
+		success("VERSION file already up to date (no commit needed)")
 	}
-	if err := runCommandVerbose("git", "push", "origin"); err != nil {
-		errorExit("Failed to push VERSION file")
-	}
-	success("VERSION file committed and pushed")
 }
 
 func runGoReleaser(version string, debug bool) {
