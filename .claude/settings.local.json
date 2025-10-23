@@ -34,7 +34,8 @@
       "Bash(cat:*)",
       "Bash(make install:*)",
       "Bash(git lfs-track:*)",
-      "Bash(make test:*)"
+      "Bash(make test:*)",
+      "Bash(goreleaser:*)"
     ],
     "deny": [],
     "ask": []
