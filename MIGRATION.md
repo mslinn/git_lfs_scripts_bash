@@ -11,11 +11,13 @@ All bash scripts in the `bin/` directory have been converted to Go commands with
 **Chosen Approach:** Independent binaries (Option A)
 
 Each command is a standalone Go binary that can be invoked directly as a Git subcommand:
+
 - `git ls-files` → `cmd/git-ls-files/main.go`
 - `git lfs-track` → `cmd/git-lfs-track/main.go`
 - etc.
 
 All commands share common code through the `internal/` packages:
+
 - `internal/common/` - Shared utilities (git operations, error handling)
 - `internal/lfsfiles/` - Pattern permutation logic (used by ls-files, track, untrack commands)
 - `internal/github/` - GitHub API operations (used by delete-github-repo)
@@ -38,25 +40,30 @@ All commands share common code through the `internal/` packages:
 ## Key Design Decisions
 
 ### 1. Multi-name Script Handling
+
 **Question:** How to handle `ls-files` script that responded to multiple names via symlinks?
 
 **Decision:** Create separate binaries (`git-ls-files`, `git-lfs-files`, `git-lfs-track`, `git-lfs-untrack`) that share code via `internal/lfsfiles` package.
 
 **Rationale:**
+
 - Simpler than symlink detection
 - Each command has clear purpose
 - No runtime overhead checking argv[0]
 - Easier to maintain and test
 
 ### 2. Flag Parsing
+
 **Change:** Bash used combined flags like `-dce`, Go uses separate flags `-d -c -e`
 
 **Rationale:** Go's standard `flag` package doesn't support GNU-style combined short flags by default. Using separate flags is more idiomatic in Go and clearer.
 
 ### 3. Git Subcommand Naming
+
 **Decision:** All commands use `git-` prefix consistently
 
 **Examples:**
+
 - `git-ls-files` (can be invoked as `git ls-files`)
 - `git-nonlfs` (can be invoked as `git nonlfs`)
 - `git-lfs-track` (can be invoked as `git lfs-track`)
@@ -67,6 +74,7 @@ All commands share common code through the `internal/` packages:
 **Decision:** Go wrapper that launches Python/uwsgi process
 
 **Rationale:**
+
 - WSGI is Python-specific, no Go equivalent
 - Go wrapper provides better process management
 - Configuration and validation can be done in Go
@@ -75,6 +83,7 @@ All commands share common code through the `internal/` packages:
 ## Installation Methods
 
 ### 1. Using Make (Recommended)
+
 ```bash
 make build
 make install                              # Installs to ~/.local/bin
@@ -82,12 +91,14 @@ make install INSTALL_DIR=/usr/local/bin   # Custom location
 ```
 
 ### 2. Using Go Install
+
 ```bash
 go install github.com/mslinn/git_lfs_scripts/cmd/git-ls-files@latest
 # repeat for each command
 ```
 
 ### 3. Manual Build
+
 ```bash
 go build -o build/git-ls-files ./cmd/git-ls-files
 # repeat for each command
@@ -96,12 +107,14 @@ go build -o build/git-ls-files ./cmd/git-ls-files
 ## Testing the Migration
 
 ### Build Verification
+
 ```bash
 make build
 ls -lh build/  # Should show all 10 binaries
 ```
 
 ### Functional Testing
+
 ```bash
 # Test help output
 ./build/git-ls-files -h
@@ -118,11 +131,13 @@ ls -lh build/  # Should show all 10 binaries
 ## Differences from Original Bash Scripts
 
 ### Functional Changes
+
 1. **Flag syntax:** `-dce` → `-d -c -e` (separate flags)
 2. **Error handling:** More detailed error messages with proper exit codes
 3. **Symlinks:** `ls-files` script is now 4 separate binaries instead of symlink-based dispatch
 
 ### Improvements
+
 1. **Cross-platform:** Works on Windows, macOS, Linux without modification
 2. **Type safety:** Compile-time checking prevents many runtime errors
 3. **Performance:** Go binaries are faster than bash scripts
@@ -135,6 +150,7 @@ ls -lh build/  # Should show all 10 binaries
 **Note:** Backward compatibility with bash scripts was explicitly NOT required.
 
 If needed in the future:
+
 - Keep bash scripts in `bin/` directory
 - Add both directories to PATH
 - Users can choose which version to use based on preference
@@ -172,6 +188,7 @@ Possible improvements now that we're in Go:
 ## Success Criteria
 
 All criteria met:
+
 - ✅ All 10 commands build successfully
 - ✅ Help output works for all commands
 - ✅ Pattern expansion works correctly (tested with dry-run)

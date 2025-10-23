@@ -23,7 +23,8 @@
       "Bash(git commit:*)",
       "Bash(go build:*)",
       "Bash(./build/git-delete-github-repo:*)",
-      "Read(//mnt/f/work/git/**)"
+      "Read(//mnt/f/work/git/**)",
+      "Bash(./build/git-giftless:*)"
     ],
     "deny": [],
     "ask": []

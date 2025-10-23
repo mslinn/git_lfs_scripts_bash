@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/lithammer/dedent"
 	"github.com/mslinn/git_lfs_scripts/internal/common"
 )
 
@@ -40,15 +41,8 @@ func main() {
 		os.Exit(0)
 	}
 
-	// Check if uwsgi is available
-	if err := checkCommand("uwsgi"); err != nil {
-		common.PrintError("uwsgi is not installed. Install with: pip install uwsgi")
-	}
-
-	// Check if giftless is available
-	if err := checkCommand("python3", "-c", "import giftless"); err != nil {
-		common.PrintError("giftless is not installed. Install with: pip install giftless")
-	}
+	// Check all prerequisites before starting
+	checkPrerequisites()
 
 	fmt.Printf("Starting Giftless LFS server on %s:%s\n", host, port)
 	fmt.Printf("Workers: %d, Threads: %d\n", workers, threads)
@@ -105,30 +99,76 @@ func main() {
 }
 
 func printHelp() {
-	fmt.Println("git-giftless - Start a Giftless Git LFS server")
-	fmt.Println()
-	fmt.Println("Usage: git giftless [OPTIONS]")
-	fmt.Println()
-	fmt.Println("OPTIONS:")
-	fmt.Println("  --venv PATH      Path to Python virtual environment (default: /opt/giftless/.venv/bin/activate)")
-	fmt.Println("  --host ADDRESS   Host address to bind to (default: 0.0.0.0)")
-	fmt.Println("  --port PORT      Port to listen on (default: 9876)")
-	fmt.Println("  --threads N      Number of threads per worker (default: 2)")
-	fmt.Println("  --workers N      Number of worker processes (default: 2)")
-	fmt.Println("  -h, --help       Show this help message")
-	fmt.Println()
-	fmt.Println("This command starts a Giftless Git LFS server using uwsgi.")
-	fmt.Println()
-	fmt.Println("Requirements:")
-	fmt.Println("  - Python 3 with giftless installed (pip install giftless)")
-	fmt.Println("  - uwsgi installed (pip install uwsgi)")
-	fmt.Println()
-	fmt.Println("Example:")
-	fmt.Println("  git giftless --port 8080 --workers 4")
+	fmt.Print(dedent.Dedent(`
+		git-giftless - Start a Giftless Git LFS server
+
+		USAGE:
+		  git giftless [OPTIONS]
+
+		OPTIONS:
+		  --venv PATH      Path to Python virtual environment (default: /opt/giftless/.venv/bin/activate)
+		  --host ADDRESS   Host address to bind to (default: 0.0.0.0)
+		  --port PORT      Port to listen on (default: 9876)
+		  --threads N      Number of threads per worker (default: 2)
+		  --workers N      Number of worker processes (default: 2)
+		  -h, --help       Show this help message
+
+		DESCRIPTION:
+		  This command starts a Giftless Git LFS server using uwsgi as a WSGI server.
+		  All prerequisites are verified before starting the server.
+
+		REQUIREMENTS:
+		  - Python 3 (python3 command must be available)
+		  - giftless Python package (pip install giftless)
+		  - uwsgi Python package (pip install uwsgi)
+
+		EXAMPLES:
+		  # Start with defaults
+		  git giftless
+
+		  # Custom port and workers
+		  git giftless --port 8080 --workers 4
+
+		  # Use specific virtual environment
+		  git giftless --venv /path/to/venv/bin/activate
+	`))
+}
+
+func checkPrerequisites() {
+	var missing []string
+
+	// Check Python 3
+	if err := checkCommand("python3", "--version"); err != nil {
+		missing = append(missing, "Python 3 (install from: https://www.python.org/)")
+	}
+
+	// Check giftless
+	if err := checkCommand("python3", "-c", "import giftless"); err != nil {
+		missing = append(missing, "giftless (install with: pip install giftless)")
+	}
+
+	// Check uwsgi
+	if err := checkCommand("uwsgi", "--version"); err != nil {
+		missing = append(missing, "uwsgi (install with: pip install uwsgi)")
+	}
+
+	if len(missing) > 0 {
+		fmt.Fprintf(os.Stderr, "Error: Missing required dependencies:\n")
+		for _, dep := range missing {
+			fmt.Fprintf(os.Stderr, "  ✗ %s\n", dep)
+		}
+		fmt.Fprintf(os.Stderr, "\nPlease install all dependencies before running git-giftless.\n")
+		os.Exit(1)
+	}
+
+	fmt.Println("✓ All prerequisites verified")
 }
 
 func checkCommand(name string, args ...string) error {
 	cmd := exec.Command(name, args...)
+	// Suppress output, we only care about exit code
+	cmd.Stdout = nil
+	cmd.Stderr = nil
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("command '%s' not found or failed", name)
 	}
