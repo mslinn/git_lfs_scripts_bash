@@ -1,4 +1,4 @@
-# Git LFS Scripts
+# Git LFS Scripts [![GitHub newest release](https://img.shields.io/github/v/release/mslinn/git_lfs_scripts_go)](https://github.com/mslinn/git_lfs_scripts_go/releases/latest)
 
 Generally useful Git subcommands for working with Git LFS.
 
