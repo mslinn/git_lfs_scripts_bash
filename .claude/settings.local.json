@@ -42,7 +42,8 @@
       "WebFetch(domain:giftless.datopian.com)",
       "WebFetch(domain:github.com)",
       "Bash(git restore:*)",
-      "Bash(./build/git-lfs-trace:*)"
+      "Bash(./build/git-lfs-trace:*)",
+      "Bash(git revert:*)"
     ],
     "deny": [],
     "ask": []
