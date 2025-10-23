@@ -11,7 +11,18 @@
       "Bash(./build/git-nonlfs:*)",
       "Bash(./build/git-lfs-track:*)",
       "Bash(tree:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push)",
+      "Read(//mnt/f/work/git/git-lfs-test/**)",
+      "Read(//mnt/f/work/dl/**)",
+      "Read(//mnt/f/work/git/git_tree/**)",
+      "Bash(git remote get-url:*)",
+      "Bash(make build-release-tool:*)",
+      "Bash(go get:*)",
+      "Bash(./release:*)",
+      "Bash(git commit:*)",
+      "Bash(go build:*)",
+      "Bash(./build/git-delete-github-repo:*)"
     ],
     "deny": [],
     "ask": []

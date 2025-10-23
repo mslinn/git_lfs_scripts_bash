@@ -1,4 +1,4 @@
-.PHONY: all build install clean test help build-release-tool
+.PHONY: all build install uninstall clean test help build-release-tool
 
 # Go parameters
 GOCMD=go
@@ -24,8 +24,19 @@ BINARIES := \
 # Build directory
 BUILD_DIR := build
 
-# Install directory (default to user's local bin, can be overridden)
-INSTALL_DIR ?= $(HOME)/.local/bin
+# Install directory using Go's standard mechanism
+# GOBIN if set, otherwise GOPATH/bin, otherwise ~/go/bin as fallback
+GOBIN ?= $(shell go env GOBIN)
+ifeq ($(GOBIN),)
+	GOPATH ?= $(shell go env GOPATH)
+	ifeq ($(GOPATH),)
+		INSTALL_DIR := $(HOME)/go/bin
+	else
+		INSTALL_DIR := $(GOPATH)/bin
+	endif
+else
+	INSTALL_DIR := $(GOBIN)
+endif
 
 # Version info
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
@@ -37,19 +48,21 @@ help:
 	@echo "Git LFS Scripts - Makefile targets:"
 	@echo ""
 	@echo "  make build         Build all binaries to $(BUILD_DIR)/"
-	@echo "  make install       Install binaries to $(INSTALL_DIR)"
+	@echo "  make install       Install binaries to GOBIN or GOPATH/bin"
+	@echo "  make uninstall     Remove installed binaries"
 	@echo "  make clean         Remove built binaries"
 	@echo "  make test          Run tests"
 	@echo "  make help          Show this help message"
 	@echo ""
 	@echo "Environment variables:"
-	@echo "  INSTALL_DIR        Installation directory (default: ~/.local/bin)"
+	@echo "  GOBIN              Go binary installation directory (overrides GOPATH/bin)"
+	@echo "  GOPATH             Go workspace path (default: ~/go)"
 	@echo "  VERSION            Version string (default: git describe or 'dev')"
 	@echo ""
 	@echo "Examples:"
 	@echo "  make build"
 	@echo "  make install"
-	@echo "  make install INSTALL_DIR=/usr/local/bin"
+	@echo "  GOBIN=/usr/local/bin make install"
 
 build:
 	@mkdir -p $(BUILD_DIR)
@@ -65,16 +78,33 @@ install: build
 	@mkdir -p $(INSTALL_DIR)
 	@for bin in $(BINARIES); do \
 		echo "  Installing $$bin..."; \
-		install -m 755 $(BUILD_DIR)/$$bin $(INSTALL_DIR)/$$bin || exit 1; \
+		/usr/bin/install -m 755 $(BUILD_DIR)/$$bin $(INSTALL_DIR)/$$bin || exit 1; \
 	done
 	@echo "Installation complete!"
 	@echo ""
 	@echo "Make sure $(INSTALL_DIR) is in your PATH."
-	@echo "You can now use commands like:"
-	@echo "  git ls-files"
-	@echo "  git lfs-track"
-	@echo "  git nonlfs"
-	@echo "  etc."
+	@echo ""
+	@echo "Installed Git LFS helper commands:"
+	@echo "  git ls-files           - List files with pattern expansion"
+	@echo "  git lfs-files          - List Git LFS tracked files with pattern expansion"
+	@echo "  git lfs-track          - Track patterns in Git LFS with expansion"
+	@echo "  git lfs-untrack        - Untrack patterns from Git LFS with expansion"
+	@echo "  git lfs-trace          - Git LFS transfer adapter for debugging"
+	@echo "  git nonlfs             - List files NOT in Git LFS"
+	@echo "  git unmigrate          - Reverse 'git lfs migrate import'"
+	@echo "  git new-bare-repo      - Create new bare Git repositories"
+	@echo "  git delete-github-repo - Delete GitHub repositories (requires gh CLI)"
+	@echo "  git giftless           - Go wrapper for Python Giftless LFS server"
+
+uninstall: ## Remove installed binaries
+	@echo "Uninstalling binaries from $(INSTALL_DIR)..."
+	@for bin in $(BINARIES); do \
+		if [ -f $(INSTALL_DIR)/$$bin ]; then \
+			echo "  Removing $$bin..."; \
+			rm -f $(INSTALL_DIR)/$$bin; \
+		fi \
+	done
+	@echo "Uninstall complete!"
 
 clean:
 	@echo "Cleaning build artifacts..."
