@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/lithammer/dedent"
 	"github.com/mslinn/git_lfs_scripts/internal/common"
+	flag "github.com/spf13/pflag"
 )
 
 const (
@@ -34,7 +34,7 @@ func main() {
 	flag.StringVar(&port, "port", defaultPort, "Port to listen on")
 	flag.IntVar(&threads, "threads", 2, "Number of threads per worker")
 	flag.IntVar(&workers, "workers", 2, "Number of worker processes")
-	flag.BoolVar(&showHelp, "h", false, "Show help")
+	flag.BoolVarP(&showHelp, "help", "h", false, "Show help")
 	flag.Parse()
 
 	if showHelp {

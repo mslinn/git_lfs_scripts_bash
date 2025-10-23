@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -10,15 +9,16 @@ import (
 	"github.com/lithammer/dedent"
 	"github.com/mslinn/git_lfs_scripts/internal/common"
 	"github.com/mslinn/git_lfs_scripts/internal/lfsfiles"
+	flag "github.com/spf13/pflag"
 )
 
 func main() {
 	var bothCases, dryRun, everywhere, showHelp bool
 
-	flag.BoolVar(&bothCases, "c", false, "Expand pattern to upper and lower case")
-	flag.BoolVar(&dryRun, "d", false, "Dry run")
-	flag.BoolVar(&everywhere, "e", false, "Apply pattern everywhere")
-	flag.BoolVar(&showHelp, "h", false, "Show help")
+	flag.BoolVarP(&bothCases, "case", "c", false, "Expand pattern to upper and lower case")
+	flag.BoolVarP(&dryRun, "dry-run", "d", false, "Dry run")
+	flag.BoolVarP(&everywhere, "everywhere", "e", false, "Apply pattern everywhere")
+	flag.BoolVarP(&showHelp, "help", "h", false, "Show help")
 	flag.Parse()
 
 	if showHelp {

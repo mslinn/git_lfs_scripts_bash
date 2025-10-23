@@ -3,11 +3,11 @@ package main
 import (
 	"bufio"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"os"
 
 	"github.com/lithammer/dedent"
+	flag "github.com/spf13/pflag"
 )
 
 // Request represents a Git LFS transfer request
@@ -67,7 +67,7 @@ func printHelp() {
 }
 
 func main() {
-	showHelp := flag.Bool("h", false, "Show help message")
+	showHelp := flag.BoolP("help", "h", false, "Show help message")
 	flag.Parse()
 
 	if *showHelp {

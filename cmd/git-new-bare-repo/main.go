@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -10,10 +9,11 @@ import (
 
 	"github.com/lithammer/dedent"
 	"github.com/mslinn/git_lfs_scripts/internal/common"
+	flag "github.com/spf13/pflag"
 )
 
 func main() {
-	showHelp := flag.Bool("h", false, "Show help")
+	showHelp := flag.BoolP("help", "h", false, "Show help")
 	flag.Parse()
 
 	if *showHelp || flag.NArg() == 0 {
