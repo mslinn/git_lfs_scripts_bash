@@ -118,7 +118,7 @@ func usage() {
 	fmt.Fprint(os.Stderr, dedent.Dedent(`
 		  -h, --help         Display this help message
 	`))
-	fmt.Fprintf(os.Stderr, dedent.Dedent(fmt.Sprintf(`
+	fmt.Fprint(os.Stderr, dedent.Dedent(fmt.Sprintf(`
 
 		VERSION:
 		  The version to release (e.g., %s)
