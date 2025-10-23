@@ -121,6 +121,7 @@ func printHelp() {
 		  - Python 3 (python3 command must be available)
 		  - flask Python package (pip install flask)
 		  - flask-marshmallow Python package (pip install flask-marshmallow)
+		  - figcan Python package (pip install figcan)
 		  - giftless Python package (pip install giftless)
 		  - uwsgi Python package (pip install uwsgi)
 
@@ -152,6 +153,11 @@ func checkPrerequisites() {
 	// Check flask_marshmallow
 	if err := checkCommand("python3", "-c", "import flask_marshmallow"); err != nil {
 		missing = append(missing, "flask-marshmallow (install with: pip install flask-marshmallow)")
+	}
+
+	// Check figcan
+	if err := checkCommand("python3", "-c", "import figcan"); err != nil {
+		missing = append(missing, "figcan (install with: pip install figcan)")
 	}
 
 	// Check giftless
