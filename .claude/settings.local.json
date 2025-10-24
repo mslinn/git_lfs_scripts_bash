@@ -43,7 +43,9 @@
       "WebFetch(domain:github.com)",
       "Bash(git restore:*)",
       "Bash(./build/git-lfs-trace:*)",
-      "Bash(git revert:*)"
+      "Bash(git revert:*)",
+      "WebFetch(domain:www.mslinn.com)",
+      "Bash(go test:*)"
     ],
     "deny": [],
     "ask": []

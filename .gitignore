@@ -18,3 +18,4 @@ dist/
 *.dylib
 *.test
 go.work
+release

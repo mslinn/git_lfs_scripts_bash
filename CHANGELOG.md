@@ -1,5 +1,11 @@
 # Change Log
 
+
+## v0.1.5 / 2025-10-23
+
+* Added unit tests for permutation logic
+
+
 ## v0.1.4 / 2025-10-23
 
 * Looking pretty good now
